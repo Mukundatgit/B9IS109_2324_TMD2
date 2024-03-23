@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+
+<!-- HOME -->
+<section class="home-section section-hero overlay bg-image"
+  style="background-image: url('{% static 'images/hero-new.jpg' %}');" id="home-section">
+
+  <div class="container">
+    <div class="row align-items-center justify-content-center">
+      <div class="col-md-12">
+        <div class="mb-5 text-center">
+          <h1 class="text-white font-weight-bold">Digitalizing Shopping Malls</h1>
+          <p>Revolutionizing the Way We Shop: Experience Digitalizing Shopping Malls.</p>
+        </div>
+        <form method="GET" action="{% url 'shoppingapp:search_result' %}" class="search-jobs-form">
+          {% include 'shoppingapp/search.html' %}
+        </form>
+      </div>
+    </div>
+  </div>
+  <a href="#next" class="scroll-button smoothscroll">
+    <span class=" icon-keyboard_arrow_down"></span>
+  </a>
+
+</section>
+
+<section class="py-5 bg-image overlay-primary fixed overlay" id="next"
+  style="background-image: url('{% static 'images/hero_1.jpg' %}');">
+  <div class="container">
+    <div class="row mb-5 justify-content-center">
+      <div class="col-md-7 text-center">
+        <h2 class="section-title mb-2 text-white">Shopping Mall Stats</h2>
+        <p class="lead text-white">If you want a rent a shop in the shopping mall and join the family. Email to x20011487@dbs.ie</p>
+      </div>
+    </div>
+    <div class="row pb-0 block__19738 section-counter">
+
+      <div class="col-6 col-md-6 col-lg-3 mb-5 mb-lg-0">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <strong class="number" data-number="{{ total_floors }}">5</strong>
+        </div>
+        <span class="caption">Floors</span>
+      </div>
+
+      <div class="col-6 col-md-6 col-lg-6 mb-5 mb-lg-0">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <strong class="number" data-number="{{ total_shops }}">0</strong>
+        </div>
+        <span class="caption">Stores Added</span>
+      </div>
+
+      <div class="col-6 col-md-6 col-lg-3 mb-5 mb-lg-0">
+        <div class="d-flex align-items-center justify-content-center mb-2">
+          <strong class="number">1</strong>
+        </div>
+        <span class="caption">Shopping Mall</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section id="ajax_listing_paginattion" class="site-section">
+  <div class="container">
+
+    {% if page_obj %}
+    <div class="row mb-5 justify-content-center">
+      <div class="col-md-7 text-center">
+        <h2 class="section-title mb-2">{{ total_shops }} Stores Listed</h2>
+      </div>
+    </div>
+
+
+    <ul id="shop" class="job-listings mb-5">
+      {% for shop in page_obj %}
+      <li class="job-listing d-block d-sm-flex pb-3 pb-sm-0 align-items-center">
+        <a href="{% url 'shoppingapp:single-shop' shop.id %}"></a>
+        <div class="job-listing-logo">
+          <img src="{{ shop.picture.url }}" style="max-height: 150px; max-width: 150px;" alt="Image">
+        </div>
+
+        <div class="job-listing-about d-sm-flex custom-width w-100 justify-content-between mx-4">
+          <div class="job-listing-position custom-width w-50 mb-3 mb-sm-0">
+            <h2>{{ shop.title }}</h2>
+          </div>
+          <div class="job-listing-location mb-3 mb-sm-0 custom-width w-25">
+            <span class="icon-room"></span> {{ shop.location }}
+          </div>
+          <div class="job-listing-meta">
+            {% if shop.shop_type == '1' %}
+            <span class="badge badge-success">
+              Open
+            </span>
+            {% elif shop.shop_type == '2'%}
+            <span class="badge badge-danger">
+              Closed
+            </span>
+            {% else  %}
+            <span class="badge badge-info">
+              Coming Soon
+            </span>
+            {% endif %}
+          </div>
+        </div>
+
+      </li>
+      {% endfor %}
+    </ul>
+    {% include 'shoppingapp/paginator.html' %}
+  </div>
+  {% endif %}
+</section>
+
+<section class="bg-light pt-5 testimony-full">
+
+  <div class="owl-carousel single-carousel">
+
+  </div>
+
+</section>
+
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+
+$("#ajax_listing_paginattion" ).delegate( "a#ajax_paginator", "click", function( event ) {
+		event.preventDefault();
+    shoplist = ``
+    next_paging = ``
+    prev_paging = ``
+    page_navigator = ``
+		var page_ref = $(this).attr('href');
+    var page_number = page_ref.slice(6);
+    console.log('page_number', page_number);
+		$.ajax({
+					type: "GET",
+					url: "{% url 'shoppingapp:home' %}", 
+					data : {    
+          page : page_number, 
+				},
+        success: function (response) {
+          $('#shop').html('')
+                    response.shop_lists.map(function (shop) {
+
+                        shoplist+=`
+                          <li id="next" class="job-listing d-block d-sm-flex pb-3 pb-sm-0 align-items-center">
+                            <a href="/shop/${shop.id}/"></a>
+                              <div class="job-listing-logo">
+                                <img src="${ shop.picture.url }" style="max-height: 150px; max-width: 150px;" alt="Image">
+                              </div>
+
+                              <div class="job-listing-about d-sm-flex custom-width w-100 justify-content-between mx-4">
+                                <div class="job-listing-position custom-width w-50 mb-3 mb-sm-0">
+                                  <h2>${ shop.title }</h2>
+                                </div>
+                                <div class="job-listing-location mb-3 mb-sm-0 custom-width w-25">
+                                  <span class="icon-room"></span>${ shop.location } 
+                                </div>
+                                
+                                <div class="job-listing-meta">
+                                  ${ shop.shop_type == '1'
+                                  ?  
+                                  `<span class="badge badge-success">
+                                    Open
+                                  </span>`
+                                  : 
+                                  shop.shop_type == '2' 
+                                  ?  
+                                  `<span class="badge badge-danger">
+                                    Closed
+                                  </span>` 
+                                  :
+                                  `<span class="badge badge-info">
+                                    Coming Soon
+                                  </span>
+                                  `
+                                  }
+                                </div>
+                              </div>
+                            </li>
+                        ` 
+                      })
+
+                        $('#shop').html(shoplist)
+                        response.next_page_number != null ?
+                        next_paging+=`<a id="ajax_paginator" class="next" href="?page=${ response.next_page_number }">Next</a>`
+                        : ''
+
+                        $('div>#next_page').html(next_paging)
+                        $('div>.active').removeClass('active')
+                        $('div>.ajax_paginator_'+response.current_page_no).addClass('active')
+                        
+                        // .attr('href','http://example.com')
+                        // .removeAttr("href");
+                        
+                        response.current_page_no > 1 ?
+                        prev_paging+=`<a id="ajax_paginator" href="?page=${ response.prev_page_number }" class="prev">Prev</a>`
+                        : ''
+                        $('div>#prev_page').html(prev_paging)
+
+                        page_navigator+=`Showing ${ response.current_page_no } of ${ response.no_of_page } Pages`
+                        $('div>#page_navigator').html(page_navigator)
+                      
+                    },
+                    
+				error: function () {
+					alert('Error Occured');
+				}
+			});
+
+	});  
+  
+  
+	</script>
+{% endblock %}
+
+

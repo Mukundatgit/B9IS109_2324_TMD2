@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block content %}
+<!-- HOME -->
+
+
+<section class="section-hero overlay inner-page bg-image"
+  style="background-image: url('{% static 'images/hero_1.jpg' %}');" id="home-section">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-7">
+        <h1 class="text-white font-weight-bold">{{ shop.title }}</h1>
+        <div class="custom-breadcrumbs">
+          <a href="{% url 'shoppingapp:home' %}">Home</a> <span class="mx-2 slash">/</span>
+          <a href="{% url 'shoppingapp:store-list' %}">Store</a> <span class="mx-2 slash">/</span>
+          <span class="text-white"><strong>{{ shop.title }}</strong></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="site-section">
+  <div class="container">
+    {% include 'messages.html' %}
+
+    <div class="row align-items-center mb-5">
+      <div class="col-lg-8 mb-4 mb-lg-0">
+        <div class="d-flex align-items-center">
+          <div class="border p-2 d-inline-block mr-3 rounded">
+            <img src="{{ shop.picture.url }}" style="max-height: 400px; max-width: 400px;" alt="Image">
+          </div>
+          <div>
+            <h2>{{ shop.title }}</h2>
+            <div>
+              <span class="ml-0 mr-2 mb-2"><span class="icon-briefcase mr-2"></span><a href="{{ shop.url }}">{{ shop.title }}</a></span>
+              <span class="m-2"><span class="icon-room mr-2"></span>{{ shop.location }}</span>
+              <span class="m-2"><span class="icon-clock-o mr-2"></span>
+                <span class="text-primary">
+
+                  {% if shop.shop_type == '1' %}
+                  Open
+                  {% elif shop.shop_type == '2'%}
+                  Closed
+                  {% else  %}
+                  Coming Soon
+                  {% endif %}
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-4">
+        <div class="row">
+          <div class="col-5">
+            {% if user.is_authenticated and user.role == 'employee' %}
+               
+            
+            {% elif request.user.id == shop.user.id and  user.role == 'employer'  %}
+            <button onclick="call_sw_alert_func('{% url 'shoppingapp:delete' shop.id %}','{{ shop.id }}','Once Deleted, You Will Not be Able To Recover This Post!')" class="btn btn-block btn-danger btn-md">Delete</button>
+                                   
+            
+
+          
+
+            {% endif %}
+
+          </div>
+
+        <div class="col-7">
+          {% if user.is_authenticated and user.role == 'employee' %}          
+            
+          {% elif request.user.id == shop.user.id and user.role == 'employer' %}
+
+          <a href="{% url 'shoppingapp:edit-shop' shop.id %}" class="btn btn-block btn-light btn-md">Edit</a>
+           {% else %}
+              
+            {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-8">
+        <div class="mb-5">
+          <h3 class="h5 d-flex align-items-center mb-4 text-primary"><span class="icon-align-left mr-3"></span>Store
+            Description</h3>
+          {{ shop.description | safe }}
+        </div>
+
+
+      </div>
+      <div class="col-lg-4">
+        <div class="bg-light p-3 border rounded mb-4">
+          <h3 class="text-primary  mt-3 h5 pl-3 mb-3 ">Store Summary</h3>
+          <ul class="list-unstyled pl-3 mb-0">
+            <li class="mb-2"><strong class="text-black">Published on:</strong> {{ shop.timestamp|date:"d M Y" }}</li>
+            <li class="mb-2"><strong class="text-black">Store Status:</strong>
+              {% if shop.shop_type == '1' %}
+              Open
+              {% elif shop.shop_type == '2'%}
+              Closed
+              {% else  %}
+              Coming Soon
+              {% endif %}
+            </li>
+            <li class="mb-2"><strong class="text-black">Store Location:</strong> {{ shop.location }}</li>
+            <li class="mb-2"><strong class="text-black">Avg Spend:</strong> {{ shop.salary }}</li>
+            
+            </li>
+          </ul>
+        </div>
+        {% if shop.title == name %}
+        <div class="bg-light p-3 border rounded mb-3">
+          <h3 class="text-primary  mt-3 h5 pl-3 mb-3 ">SHOP ON SALE</h3>
+         <strong>Shop which is currently occupied by {{ name }} on {{ shop.location }} will be on off at {{ percent }}% </strong>
+         <ul class="list-unstyled pl-3 mb-2 mt-3">
+          <li class="mb-2"><strong class="text-black">Current Value:</strong> {{ price }}</li>
+          <li class="mb-2"><strong class="text-black">Discounted Value:</strong> {{ discount }}</li>
+        </ul>
+          <p>Rental agreement is on per anum basis.</p>
+        </div>
+        {% endif %}
+        <div class="bg-light p-3 border rounded">
+          <h3 class="text-primary  mt-3 h5 pl-3 mb-3 ">Social Media</h3>
+          <div class="px-3">
+            <a href="#" class="pt-3 pb-3 pr-3 pl-0"><span class="icon-facebook"></span></a>
+            <a href="#" class="pt-3 pb-3 pr-3 pl-0"><span class="icon-twitter"></span></a>
+            <a href="#" class="pt-3 pb-3 pr-3 pl-0"><span class="icon-linkedin"></span></a>
+            <a href="#" class="pt-3 pb-3 pr-3 pl-0"><span class="icon-pinterest"></span></a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+{% if page_obj %}
+
+<section class="site-section" id="next">
+  <div class="container">
+
+    <div class="row mb-5 justify-content-center">
+      <div class="col-md-7 text-center">
+        <h2 class="section-title mb-2">{{ total }} Related Shop</h2>
+      </div>
+    </div>
+
+    <ul class="job-listings mb-5">
+      {% for shop in page_obj %}
+      <li class="job-listing d-block d-sm-flex pb-3 pb-sm-0 align-items-center">
+        <a href="{% url 'shoppingapp:single-shop' shop.id %}"></a>
+        <div class="job-listing-logo">
+          <img src="{{ shop.picture.url }}" style="max-height: 150px; max-width: 150px;" alt="Image">
+        </div>
+
+        <div class="job-listing-about d-sm-flex custom-width w-100 justify-content-between mx-4">
+          <div class="job-listing-position custom-width w-50 mb-3 mb-sm-0">
+            <h2>{{ shop.title}}</h2>
+          </div>
+          <div class="job-listing-location mb-3 mb-sm-0 custom-width w-25">
+            <span class="icon-room"></span> {{ shop.location }}
+          </div>
+          <div class="job-listing-meta">
+            <span class="badge badge-danger">
+              {% if shop.shop_type == '1' %}
+              Open
+              {% elif shop.shop_type == '2'%}
+              Closed
+              {% else  %}
+              Coming Soon
+              {% endif %}
+            </span>
+          </div>
+        </div>
+      </li>
+      {% endfor %}
+
+
+    </ul>
+
+
+    {% include 'shoppingapp/paginator.html' %}
+
+  </div>
+</section>
+{% endif %}
+{% endblock content %}
+{% block extra_scripts %}
+<script src="{% static 'js/sweet-alert.js' %}"></script>
+<script src="{% static 'js/sweet-alert-ajax.js' %}"></script>
+
+{% endblock %}
