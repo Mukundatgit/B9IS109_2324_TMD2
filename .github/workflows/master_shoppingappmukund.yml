@@ -33,9 +33,6 @@ jobs:
       - name: Making Migrations 
         run: python manage.py makemigrations
 
-      - name: Applying Migrations to the Database
-        run: python manage.py migrate
-
       - name: Collecting Static files
         run: python manage.py collectstatic
 
