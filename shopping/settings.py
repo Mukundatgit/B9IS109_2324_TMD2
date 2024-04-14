@@ -74,10 +74,10 @@ WSGI_APPLICATION = 'shopping.wsgi.application'
 DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': 'postgres',
-            'USER': 'user',
-            'PASSWORD': 'password123',
-            'HOST': '127.0.0.1',
+            'NAME': 'shoppingappmukund-database',
+            'USER': 'ymulpxtkew',
+            'PASSWORD': 'K$hS5Viy3Sb0zZ30',
+            'HOST': 'shoppingappmukund-server.postgres.database.azure.com',
             'PORT': '5432',
             'OPTIONS':{ 
                 'sslmode': 'disable',
